@@ -17,7 +17,7 @@ test("shows success toast by default without adding inline output", async () => 
   const originalFetch = global.fetch;
   const originalHome = process.env.HOME;
 
-  process.env.HOME = "/tmp/9router-plugin-tests-no-config";
+  process.env.HOME = "/tmp/9routerplus-plugin-tests-no-config";
 
   const fetchMock = createFetchMock(async (input) => {
     const url = String(input);
@@ -62,8 +62,8 @@ test("shows success toast by default without adding inline output", async () => 
       {
         sessionID: "session-1",
         agent: "test",
-        model: { id: "sonnet", providerID: "9router" },
-        provider: { info: { id: "9router" } },
+        model: { id: "sonnet", providerID: "9routerplus" },
+        provider: { info: { id: "9routerplus" } },
         message: {},
       },
       {},
@@ -78,7 +78,7 @@ test("shows success toast by default without adding inline output", async () => 
     assert.equal(fetchMock.calls.length, 1);
     assert.equal(output.text, "Assistant answer");
     assert.equal(toastCalls.length, 1);
-    assert.equal(toastCalls[0].body.title, "9ROUTER TODAY · $0");
+    assert.equal(toastCalls[0].body.title, "9ROUTERPLUS TODAY · $0");
     assert.equal(toastCalls[0].body.message, "TOTAL REQUEST 12\nIN 1K · OUT 567");
   } finally {
     global.fetch = originalFetch;
@@ -91,7 +91,7 @@ test("uses today as the default period for success toast summaries", async () =>
   const originalFetch = global.fetch;
   const originalHome = process.env.HOME;
 
-  process.env.HOME = "/tmp/9router-plugin-tests-no-config";
+  process.env.HOME = "/tmp/9routerplus-plugin-tests-no-config";
 
   const fetchMock = createFetchMock(async (input) => {
     return {
@@ -131,8 +131,8 @@ test("uses today as the default period for success toast summaries", async () =>
       {
         sessionID: "session-2",
         agent: "test",
-        model: { id: "sonnet", providerID: "9router" },
-        provider: { info: { id: "9router" } },
+        model: { id: "sonnet", providerID: "9routerplus" },
+        provider: { info: { id: "9routerplus" } },
         message: {},
       },
       {},
@@ -146,7 +146,7 @@ test("uses today as the default period for success toast summaries", async () =>
 
     assert.equal(fetchMock.calls.length, 1);
     assert.match(String(fetchMock.calls[0].input), /period=today/);
-    assert.equal(toastCalls[0].body.title, "9ROUTER TODAY · $0");
+    assert.equal(toastCalls[0].body.title, "9ROUTERPLUS TODAY · $0");
     assert.equal(toastCalls[0].body.message, "TOTAL REQUEST 1\nIN 10 · OUT 20");
   } finally {
     global.fetch = originalFetch;
@@ -159,7 +159,7 @@ test("prefers completed text as the success path even if session.idle fires firs
   const originalFetch = global.fetch;
   const originalHome = process.env.HOME;
 
-  process.env.HOME = "/tmp/9router-plugin-tests-no-config";
+  process.env.HOME = "/tmp/9routerplus-plugin-tests-no-config";
 
   const fetchMock = createFetchMock(async (input) => {
     const url = String(input);
@@ -208,8 +208,8 @@ test("prefers completed text as the success path even if session.idle fires firs
       {
         sessionID: "session-dedupe",
         agent: "test",
-        model: { id: "sonnet", providerID: "9router" },
-        provider: { info: { id: "9router" } },
+        model: { id: "sonnet", providerID: "9routerplus" },
+        provider: { info: { id: "9routerplus" } },
         message: {},
       },
       {},
@@ -227,7 +227,7 @@ test("prefers completed text as the success path even if session.idle fires firs
 
     assert.equal(fetchMock.calls.length, 1);
     assert.equal(toastCalls.length, 1);
-    assert.equal(logs.filter((line) => line.includes("9ROUTER TODAY")).length, 0);
+    assert.equal(logs.filter((line) => line.includes("9ROUTERPLUS TODAY")).length, 0);
     assert.equal(output.text, "Assistant answer");
   } finally {
     console.log = originalConsoleLog;
@@ -241,7 +241,7 @@ test("does not consume debounce state on failed idle fallback before completed t
   const originalFetch = global.fetch;
   const originalHome = process.env.HOME;
 
-  process.env.HOME = "/tmp/9router-plugin-tests-no-config";
+  process.env.HOME = "/tmp/9routerplus-plugin-tests-no-config";
 
   let summaryRequestCount = 0;
   const fetchMock = createFetchMock(async (input) => {
@@ -301,8 +301,8 @@ test("does not consume debounce state on failed idle fallback before completed t
       {
         sessionID: "session-failed-idle",
         agent: "test",
-        model: { id: "sonnet", providerID: "9router" },
-        provider: { info: { id: "9router" } },
+        model: { id: "sonnet", providerID: "9routerplus" },
+        provider: { info: { id: "9routerplus" } },
         message: {},
       },
       {},
@@ -322,7 +322,7 @@ test("does not consume debounce state on failed idle fallback before completed t
 
     assert.equal(summaryRequestCount, 2);
     assert.equal(toastCalls.length, 2);
-    assert.equal(logs.filter((line) => line.includes("9ROUTER TODAY")).length, 0);
+    assert.equal(logs.filter((line) => line.includes("9ROUTERPLUS TODAY")).length, 0);
     assert.equal(output.text, "Assistant answer");
   } finally {
     console.log = originalConsoleLog;
@@ -336,7 +336,7 @@ test("does not emit success status when provider is not allowed", async () => {
   const originalFetch = global.fetch;
   const originalHome = process.env.HOME;
 
-  process.env.HOME = "/tmp/9router-plugin-tests-no-config";
+  process.env.HOME = "/tmp/9routerplus-plugin-tests-no-config";
 
   const fetchMock = createFetchMock(async (input) => {
     throw new Error(`Unexpected fetch: ${String(input)}`);
@@ -354,7 +354,7 @@ test("does not emit success status when provider is not allowed", async () => {
         serverUrl: "http://localhost:4096",
         directory: "/workspaces/plugin-9router-plus",
       },
-      { allowedProviders: ["9router"] },
+      { allowedProviders: ["9routerplus"] },
     );
 
     await plugin["chat.params"](
@@ -393,7 +393,7 @@ test("shows usage when model id is namespaced under allowed provider", async () 
   const originalFetch = global.fetch;
   const originalHome = process.env.HOME;
 
-  process.env.HOME = "/tmp/9router-plugin-tests-no-config";
+  process.env.HOME = "/tmp/9routerplus-plugin-tests-no-config";
 
   const fetchMock = createFetchMock(async (input) => {
     const url = String(input);
@@ -438,7 +438,7 @@ test("shows usage when model id is namespaced under allowed provider", async () 
       {
         sessionID: "session-namespaced-model",
         agent: "test",
-        model: { id: "9router/cx/gpt-5.3-codex" },
+        model: { id: "9routerplus/cx/gpt-5.3-codex" },
         provider: { info: { id: "openrouter" } },
         message: {},
       },
@@ -453,7 +453,7 @@ test("shows usage when model id is namespaced under allowed provider", async () 
 
     assert.equal(fetchMock.calls.length, 1);
     assert.equal(toastCalls.length, 1);
-    assert.equal(toastCalls[0].body.title, "9ROUTER TODAY · $0");
+    assert.equal(toastCalls[0].body.title, "9ROUTERPLUS TODAY · $0");
     assert.equal(toastCalls[0].body.message, "TOTAL REQUEST 3\nIN 300 · OUT 150");
     assert.equal(output.text, "Assistant answer");
     assert.doesNotMatch(toastCalls[0].body.message, /openrouter\/9router\/cx\/gpt-5\.3-codex/);
@@ -468,7 +468,7 @@ test("does not emit success status when provider attribution is missing", async 
   const originalFetch = global.fetch;
   const originalHome = process.env.HOME;
 
-  process.env.HOME = "/tmp/9router-plugin-tests-no-config";
+  process.env.HOME = "/tmp/9routerplus-plugin-tests-no-config";
 
   const fetchMock = createFetchMock(async (input) => {
     throw new Error(`Unexpected fetch: ${String(input)}`);
@@ -511,7 +511,7 @@ test("shows success via toast only without adding inline output and still uses o
   const originalFetch = global.fetch;
   const originalHome = process.env.HOME;
 
-  process.env.HOME = "/tmp/9router-plugin-tests-no-config";
+  process.env.HOME = "/tmp/9routerplus-plugin-tests-no-config";
 
   const fetchMock = createFetchMock(async (input) => {
     const url = String(input);
@@ -560,8 +560,8 @@ test("shows success via toast only without adding inline output and still uses o
       {
         sessionID: "session-toast-only",
         agent: "test",
-        model: { id: "sonnet", providerID: "9router" },
-        provider: { info: { id: "9router" } },
+        model: { id: "sonnet", providerID: "9routerplus" },
+        provider: { info: { id: "9routerplus" } },
         message: {},
       },
       {},
@@ -576,7 +576,7 @@ test("shows success via toast only without adding inline output and still uses o
     assert.equal(fetchMock.calls.length, 1);
     assert.equal(toastCalls.length, 1);
     assert.equal(output.text, "Assistant answer");
-    assert.equal(toastCalls[0].body.title, "9ROUTER TODAY · $0");
+    assert.equal(toastCalls[0].body.title, "9ROUTERPLUS TODAY · $0");
     assert.equal(toastCalls[0].body.message, "TOTAL REQUEST 9\nIN 900 · OUT 450");
   } finally {
     global.fetch = originalFetch;
@@ -588,7 +588,7 @@ test("shows success via both inline output and toast from the same summary reque
   const originalFetch = global.fetch;
   const originalHome = process.env.HOME;
 
-  process.env.HOME = "/tmp/9router-plugin-tests-no-config";
+  process.env.HOME = "/tmp/9routerplus-plugin-tests-no-config";
 
   const fetchMock = createFetchMock(async (input) => {
     const url = String(input);
@@ -637,8 +637,8 @@ test("shows success via both inline output and toast from the same summary reque
       {
         sessionID: "session-both",
         agent: "test",
-        model: { id: "sonnet", providerID: "9router" },
-        provider: { info: { id: "9router" } },
+        model: { id: "sonnet", providerID: "9routerplus" },
+        provider: { info: { id: "9routerplus" } },
         message: {},
       },
       {},
@@ -652,7 +652,7 @@ test("shows success via both inline output and toast from the same summary reque
 
     assert.equal(fetchMock.calls.length, 1);
     assert.equal(toastCalls.length, 1);
-    assert.match(output.text, /9ROUTER TODAY · REQ 5 · \$1 · IN 2K · OUT 750/);
+    assert.match(output.text, /9ROUTERPLUS TODAY · REQ 5 · \$1 · IN 2K · OUT 750/);
   } finally {
     global.fetch = originalFetch;
     process.env.HOME = originalHome;

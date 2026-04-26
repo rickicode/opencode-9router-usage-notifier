@@ -1,19 +1,19 @@
 {
-  "name": "opencode-9router-usage",
+  "name": "opencode-9routerplus-usage",
   "version": "0.1.0",
-  "description": "OpenCode plugin that shows 9router usage stats after AI completion",
+  "description": "OpenCode plugin that shows 9routerplus usage stats after AI completion",
   "main": "index.js",
   "type": "module",
-  "keywords": ["opencode-plugin", "opencode", "9router", "usage", "notification"],
+  "keywords": ["opencode-plugin", "opencode", "9routerplus", "usage", "notification"],
   "author": "rickicode",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rickicode/opencode-9router-usage.git"
+    "url": "git+https://github.com/rickicode/opencode-9routerplus-usage.git"
   },
-  "homepage": "https://github.com/rickicode/opencode-9router-usage#readme",
+  "homepage": "https://github.com/rickicode/opencode-9routerplus-usage#readme",
   "bugs": {
-    "url": "https://github.com/rickicode/opencode-9router-usage/issues"
+    "url": "https://github.com/rickicode/opencode-9routerplus-usage/issues"
   },
   "publishConfig": {
     "access": "public"
@@ -23,7 +23,7 @@
     "setup": "node scripts/quick-setup.js"
   },
   "bin": {
-    "opencode-9router-usage": "scripts/install-cli.js"
+    "opencode-9routerplus-usage": "scripts/install-cli.js"
   },
   "files": [
     "index.js",

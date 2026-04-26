@@ -1,6 +1,6 @@
 # 9Router Usage Notifier
 
-OpenCode plugin that displays 9router usage statistics after each completed assistant turn.
+OpenCode plugin that displays 9routerplus usage statistics after each completed assistant turn.
 
 ## Features
 
@@ -15,27 +15,27 @@ OpenCode plugin that displays 9router usage statistics after each completed assi
 Primary install flow:
 
 ```bash
-npx opencode-9router-usage
+npx opencode-9routerplus-usage
 ```
 
 What the installer does:
 
-- creates `~/.config/opencode/9router-usage.json` if missing
-- adds `opencode-9router-usage` to `~/.config/opencode/opencode.json`
+- creates `~/.config/opencode/9routerplus-usage.json` if missing
+- adds `opencode-9routerplus-usage` to `~/.config/opencode/opencode.json`
 - relies on OpenCode's npm plugin support so the plugin is installed/loaded from the package entry directly
 
 Manual fallback:
 
 ```bash
-npm install -g opencode-9router-usage
-opencode-9router-usage
+npm install -g opencode-9routerplus-usage
+opencode-9routerplus-usage
 ```
 
 If you prefer to edit OpenCode config yourself, add this plugin entry:
 
 ```json
 {
-  "plugin": ["opencode-9router-usage"]
+  "plugin": ["opencode-9routerplus-usage"]
 }
 ```
 
@@ -57,16 +57,16 @@ when working from this repo locally.
     "@spoons-and-mirrors/subtask2@latest",
     "opencode-agent-skills",
     "@tarquinen/opencode-dcp@latest",
-    "opencode-9router-usage"
+    "opencode-9routerplus-usage"
   ]
 }
 ```
 
-The `npx opencode-9router-usage` command can add this automatically.
+The `npx opencode-9routerplus-usage` command can add this automatically.
 
 2) Create plugin config file next to `opencode.json`:
 
-Path: `~/.config/opencode/9router-usage.json`
+Path: `~/.config/opencode/9routerplus-usage.json`
 
 ```json
 {
@@ -77,7 +77,7 @@ Path: `~/.config/opencode/9router-usage.json`
   "successDisplay": "toast",
   "minNotifyIntervalMs": 1500,
   "requestTimeoutMs": 3500,
-  "allowedProviders": ["9router"]
+  "allowedProviders": ["9routerplus"]
 }
 ```
 
@@ -88,7 +88,7 @@ Minimal (recommended to start):
   "baseURL": "http://localhost:20128",
   "period": "today",
   "successDisplay": "toast",
-  "allowedProviders": ["9router"]
+  "allowedProviders": ["9routerplus"]
 }
 ```
 
@@ -100,7 +100,7 @@ npm run setup
 
 ### Options
 
-- `baseURL` - 9router-plus server URL (default: `http://localhost:20128`)
+- `baseURL` - 9routerplus server URL (default: `http://localhost:20128`)
 - `period` - Time period: `today`, `last24h`, or `7d` (default: `today`)
 - `enabled` - Enable/disable plugin (default: `true`)
 - `toast` - Enable/disable TUI toast notifications (default: `true`)
@@ -123,14 +123,14 @@ Once installed and configured, the plugin shows a success toast after each eligi
 
 ```text
 ────────────────────────────────────────────────────
-9ROUTER TODAY · REQ 1023 · $155 · IN 155M · OUT 150K
+9ROUTERPLUS TODAY · REQ 1023 · $155 · IN 155M · OUT 150K
 ────────────────────────────────────────────────────
 ```
 
 Default success toast content:
 
 ```text
-Title: 9ROUTER TODAY · $155
+Title: 9ROUTERPLUS TODAY · $155
 Message: TOTAL REQUEST 1023
 IN 155M · OUT 150K
 ```
@@ -138,4 +138,4 @@ IN 155M · OUT 150K
 ## Requirements
 
 - OpenCode with plugin support
-- 9router-plus running with `/api/plugin/usage-summary` endpoint
+- 9routerplus running with `/api/plugin/usage-summary` endpoint

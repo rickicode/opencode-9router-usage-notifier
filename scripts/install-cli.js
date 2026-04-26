@@ -3,8 +3,9 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { ensureDefaultConfig, getHomeDirectory, getOpencodeDir } from "./quick-setup.js";
 
-const PACKAGE_NAME = "opencode-9router-usage";
+const PACKAGE_NAME = "opencode-9routerplus-usage";
 const CONFIG_FILENAME = "opencode.json";
+const LOG_PREFIX = "[9routerplus-usage]";
 
 function getOpencodeConfigPath(home = getHomeDirectory()) {
   const opencodeDir = getOpencodeDir(home);
@@ -55,6 +56,7 @@ export async function installFromPackage(home = getHomeDirectory()) {
   return {
     configPath: setupResult.configPath,
     configCreated: setupResult.created,
+    configMigrated: setupResult.migrated,
     opencodeConfigPath,
     pluginRegistered: added,
     packageName: PACKAGE_NAME,
@@ -65,21 +67,22 @@ async function main() {
   const result = await installFromPackage();
 
   if (result.configCreated) {
-    console.log(`[9router-usage] Created config: ${result.configPath}`);
+    const action = result.configMigrated ? "Migrated config" : "Created config";
+    console.log(`${LOG_PREFIX} ${action}: ${result.configPath}`);
   } else {
-    console.log(`[9router-usage] Config already exists: ${result.configPath}`);
+    console.log(`${LOG_PREFIX} Config already exists: ${result.configPath}`);
   }
 
   if (result.pluginRegistered) {
-    console.log(`[9router-usage] Added plugin package to ${result.opencodeConfigPath}`);
+    console.log(`${LOG_PREFIX} Added plugin package to ${result.opencodeConfigPath}`);
   } else {
-    console.log(`[9router-usage] Plugin package already present in ${result.opencodeConfigPath}`);
+    console.log(`${LOG_PREFIX} Plugin package already present in ${result.opencodeConfigPath}`);
   }
 
-  console.log(`[9router-usage] OpenCode will install/load plugin package: ${result.packageName}`);
+  console.log(`${LOG_PREFIX} OpenCode will install/load plugin package: ${result.packageName}`);
 }
 
 main().catch((error) => {
-  console.error(`[9router-usage] Install failed: ${error?.message || error}`);
+  console.error(`${LOG_PREFIX} Install failed: ${error?.message || error}`);
   process.exit(1);
 });

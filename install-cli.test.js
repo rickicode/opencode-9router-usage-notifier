@@ -11,7 +11,7 @@ async function readJson(filePath) {
 }
 
 test("installFromPackage creates config and registers package plugin", async () => {
-  const home = await mkdtemp(path.join(os.tmpdir(), "9router-install-"));
+  const home = await mkdtemp(path.join(os.tmpdir(), "9routerplus-install-"));
 
   const result = await installFromPackage(home);
   const pluginConfig = await readJson(result.configPath);
@@ -20,22 +20,22 @@ test("installFromPackage creates config and registers package plugin", async () 
   assert.equal(result.configCreated, true);
   assert.equal(result.pluginRegistered, true);
   assert.equal(pluginConfig.baseURL, "http://localhost:20128");
-  assert.deepEqual(opencodeConfig.plugin, ["opencode-9router-usage"]);
+  assert.deepEqual(opencodeConfig.plugin, ["opencode-9routerplus-usage"]);
 });
 
 test("installFromPackage preserves existing config and avoids duplicate plugin entries", async () => {
-  const home = await mkdtemp(path.join(os.tmpdir(), "9router-install-existing-"));
+  const home = await mkdtemp(path.join(os.tmpdir(), "9routerplus-install-existing-"));
   const opencodeDir = path.join(home, ".config", "opencode");
   await mkdir(opencodeDir, { recursive: true });
 
   await writeFile(
-    path.join(opencodeDir, "9router-usage.json"),
+    path.join(opencodeDir, "9routerplus-usage.json"),
     `${JSON.stringify({ baseURL: "http://example.test", period: "7d" }, null, 2)}\n`,
     "utf8",
   );
   await writeFile(
     path.join(opencodeDir, "opencode.json"),
-    `${JSON.stringify({ plugin: ["opencode-9router-usage", "other-plugin"] }, null, 2)}\n`,
+    `${JSON.stringify({ plugin: ["opencode-9routerplus-usage", "other-plugin"] }, null, 2)}\n`,
     "utf8",
   );
 
@@ -46,5 +46,5 @@ test("installFromPackage preserves existing config and avoids duplicate plugin e
   assert.equal(result.configCreated, false);
   assert.equal(result.pluginRegistered, false);
   assert.equal(pluginConfig.baseURL, "http://example.test");
-  assert.deepEqual(opencodeConfig.plugin, ["opencode-9router-usage", "other-plugin"]);
+  assert.deepEqual(opencodeConfig.plugin, ["opencode-9routerplus-usage", "other-plugin"]);
 });

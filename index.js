@@ -1,9 +1,9 @@
-// 9Router Usage Notifier Plugin for OpenCode
+// 9RouterPlus Usage Plugin for OpenCode
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 const VALID_PERIODS = new Set(["today", "last24h", "7d"]);
-const EXTERNAL_CONFIG_FILENAME = "9router-usage.json";
+const EXTERNAL_CONFIG_FILENAME = "9routerplus-usage.json";
 function formatMetric(label, value) {
   return `${label} ${value}`;
 }
@@ -26,11 +26,11 @@ function normalizeSummary(raw = {}) {
 }
 
 function normalizeAllowedProviders(value) {
-  if (!Array.isArray(value)) return ["9router"];
+  if (!Array.isArray(value)) return ["9routerplus"];
   const result = value
     .map((item) => String(item || "").trim().toLowerCase())
     .filter(Boolean);
-  return result.length > 0 ? result : ["9router"];
+  return result.length > 0 ? result : ["9routerplus"];
 }
 
 function normalizeSuccessDisplay(value) {
@@ -97,13 +97,13 @@ function formatPeriodLabel(period) {
 
 function formatHeaderLine(period, summary) {
   return [
-    `9ROUTER ${formatPeriodLabel(period)}`,
+    `9ROUTERPLUS ${formatPeriodLabel(period)}`,
     formatMetric("REQ", formatRequestCount(summary.totalRequests)),
   ].join(" · ");
 }
 
 function formatToastTitle(period, summary) {
-  return [`9ROUTER ${formatPeriodLabel(period)}`, formatCurrencyCompact(summary.estimatedCost)].join(" · ");
+  return [`9ROUTERPLUS ${formatPeriodLabel(period)}`, formatCurrencyCompact(summary.estimatedCost)].join(" · ");
 }
 
 function formatDetailLine(summary) {
@@ -147,7 +147,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
     successDisplay: "toast",
     minNotifyIntervalMs: 1500,
     requestTimeoutMs: 3500,
-    allowedProviders: ["9router"],
+    allowedProviders: ["9routerplus"],
     ...externalConfig,
     ...options,
   };
@@ -246,7 +246,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
   async function logToastFailure(error) {
     await ctx.client?.app?.log?.({
       body: {
-        service: "opencode-9router-usage",
+        service: "opencode-9routerplus-usage",
         level: "warn",
         message: "Failed to show TUI toast",
         extra: {
@@ -371,7 +371,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
 
 
   return {
-    name: "opencode-9router-usage",
+    name: "opencode-9routerplus-usage",
 
     "chat.message": async (input) => {
       const providerID = input?.model?.providerID;

@@ -1,6 +1,9 @@
 #!/usr/bin/env node
-import { mkdir, writeFile, access } from "node:fs/promises";
+import { mkdir, writeFile, access, copyFile } from "node:fs/promises";
 import path from "node:path";
+
+const CONFIG_FILENAME = "9routerplus-usage.json";
+const LEGACY_CONFIG_FILENAME = "9router-usage.json";
 
 export const defaultConfig = {
   baseURL: "http://localhost:20128",
@@ -10,7 +13,7 @@ export const defaultConfig = {
   successDisplay: "toast",
   minNotifyIntervalMs: 1500,
   requestTimeoutMs: 3500,
-  allowedProviders: ["9router"],
+  allowedProviders: ["9routerplus"],
 };
 
 export function getHomeDirectory(env = process.env) {
@@ -25,7 +28,13 @@ export function getOpencodeDir(home = getHomeDirectory()) {
 export function getConfigPath(home = getHomeDirectory()) {
   const opencodeDir = getOpencodeDir(home);
   if (!opencodeDir) return null;
-  return path.join(opencodeDir, "9router-usage.json");
+  return path.join(opencodeDir, CONFIG_FILENAME);
+}
+
+export function getLegacyConfigPath(home = getHomeDirectory()) {
+  const opencodeDir = getOpencodeDir(home);
+  if (!opencodeDir) return null;
+  return path.join(opencodeDir, LEGACY_CONFIG_FILENAME);
 }
 
 async function exists(filePath) {
@@ -44,33 +53,44 @@ export async function ensureDefaultConfig(home = getHomeDirectory()) {
 
   const opencodeDir = getOpencodeDir(home);
   const configPath = getConfigPath(home);
+  const legacyConfigPath = getLegacyConfigPath(home);
   await mkdir(opencodeDir, { recursive: true });
 
   if (await exists(configPath)) {
-    return { created: false, configPath };
+    return { created: false, migrated: false, configPath };
+  }
+
+  if (await exists(legacyConfigPath)) {
+    await copyFile(legacyConfigPath, configPath);
+    return { created: true, migrated: true, configPath };
   }
 
   await writeFile(configPath, `${JSON.stringify(defaultConfig, null, 2)}\n`, "utf8");
-  return { created: true, configPath };
+  return { created: true, migrated: false, configPath };
 }
 
 async function main() {
   const result = await ensureDefaultConfig();
 
   if (!result.created) {
-    console.log(`[9router-usage] Config already exists: ${result.configPath}`);
-    console.log("[9router-usage] Skip overwrite. Delete file first if you want to recreate.");
+    console.log(`[9routerplus-usage] Config already exists: ${result.configPath}`);
+    console.log("[9routerplus-usage] Skip overwrite. Delete file first if you want to recreate.");
     return;
   }
 
-  console.log(`[9router-usage] Created config: ${result.configPath}`);
+  if (result.migrated) {
+    console.log(`[9routerplus-usage] Migrated config to: ${result.configPath}`);
+    return;
+  }
+
+  console.log(`[9routerplus-usage] Created config: ${result.configPath}`);
 }
 
 const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname);
 
 if (isDirectRun) {
   main().catch((error) => {
-    console.error(`[9router-usage] Setup failed: ${error?.message || error}`);
+    console.error(`[9routerplus-usage] Setup failed: ${error?.message || error}`);
     process.exit(1);
   });
 }
