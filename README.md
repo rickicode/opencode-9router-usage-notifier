@@ -12,11 +12,27 @@ OpenCode plugin that displays 9router usage statistics after each completed assi
 
 ## Installation
 
+Primary install flow:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rickicode/opencode-9router-usage-notifier/main/scripts/install.sh | bash
+```
+
+What the installer does:
+
+- clones or updates the plugin in `~/.config/opencode/plugins/9router-usage-notifier`
+- runs `npm install`
+- runs `npm run setup` to create `~/.config/opencode/9router-usage.json` if missing
+- reminds you to ensure the plugin entry exists in `~/.config/opencode/opencode.json`
+
+Manual fallback:
+
 ```bash
 cd ~/.config/opencode/plugins
-git clone <repo-url> 9router-usage-notifier
+git clone https://github.com/rickicode/opencode-9router-usage-notifier.git 9router-usage-notifier
 cd 9router-usage-notifier
 npm install
+npm run setup
 ```
 
 ## Configuration

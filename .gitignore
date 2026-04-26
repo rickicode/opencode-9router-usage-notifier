@@ -17,3 +17,6 @@ context-snapshot.json
 # OS/editor junk
 .DS_Store
 *.swp
+
+# AI assistant artifacts
+session-log.md

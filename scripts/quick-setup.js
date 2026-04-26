@@ -17,6 +17,7 @@ const defaultConfig = {
   period: "today",
   enabled: true,
   toast: true,
+  successDisplay: "toast",
   minNotifyIntervalMs: 1500,
   requestTimeoutMs: 3500,
   allowedProviders: ["9router"],
