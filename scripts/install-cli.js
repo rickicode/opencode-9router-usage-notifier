@@ -52,23 +52,35 @@ export async function installFromPackage(home = getHomeDirectory()) {
   const config = await loadConfig(opencodeConfigPath);
   const { config: nextConfig, added } = ensurePluginEntry(config);
   await writeFile(opencodeConfigPath, `${JSON.stringify(nextConfig, null, 2)}\n`, "utf8");
+  const installedUsageConfig = await loadConfig(setupResult.configPath);
 
   return {
     configPath: setupResult.configPath,
     configCreated: setupResult.created,
     configMigrated: setupResult.migrated,
+    installedUsageConfig,
     opencodeConfigPath,
     pluginRegistered: added,
     packageName: PACKAGE_NAME,
   };
 }
 
-async function main() {
-  const result = await installFromPackage();
+function formatUsageConfigStatus(config) {
+  return JSON.stringify(config, null, 2);
+}
 
+function printUsageConfigStatus(configPath, config) {
+  console.log(`${LOG_PREFIX} Installed usage config: ${configPath}`);
+  console.log(formatUsageConfigStatus(config));
+}
+
+function getConfigActionLabel(result) {
+  return result.configMigrated ? "Migrated config" : "Created config";
+}
+
+function printInstallSummary(result) {
   if (result.configCreated) {
-    const action = result.configMigrated ? "Migrated config" : "Created config";
-    console.log(`${LOG_PREFIX} ${action}: ${result.configPath}`);
+    console.log(`${LOG_PREFIX} ${getConfigActionLabel(result)}: ${result.configPath}`);
   } else {
     console.log(`${LOG_PREFIX} Config already exists: ${result.configPath}`);
   }
@@ -82,6 +94,14 @@ async function main() {
   console.log(`${LOG_PREFIX} OpenCode will install/load plugin package: ${result.packageName}`);
   console.log(`${LOG_PREFIX} If 9routerplus is not at http://localhost:20128, update baseURL in ${result.configPath}`);
   console.log(`${LOG_PREFIX} If your OpenCode provider name is 9router or your model namespace is not 9routerplus, update allowedProviders in ${result.configPath} to match the real provider/model name.`);
+  printUsageConfigStatus(result.configPath, result.installedUsageConfig);
+}
+
+export { formatUsageConfigStatus, printUsageConfigStatus, printInstallSummary };
+
+async function main() {
+  const result = await installFromPackage();
+  printInstallSummary(result);
 }
 
 main().catch((error) => {

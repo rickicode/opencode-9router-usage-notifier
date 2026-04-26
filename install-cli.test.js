@@ -23,6 +23,7 @@ test("installFromPackage creates config and registers package plugin", async () 
   assert.equal(pluginConfig.baseURL, "http://localhost:20128");
   assert.equal(pluginConfig.usageDisplay, "toast");
   assert.deepEqual(pluginConfig.allowedProviders, ["9routerplus"]);
+  assert.deepEqual(result.installedUsageConfig, pluginConfig);
   assert.deepEqual(opencodeConfig.plugin, ["opencode-9routerplus-usage"]);
 });
 
