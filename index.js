@@ -246,7 +246,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
   async function logToastFailure(error) {
     await ctx.client?.app?.log?.({
       body: {
-        service: "9router-usage-notifier",
+        service: "opencode-9router-usage",
         level: "warn",
         message: "Failed to show TUI toast",
         extra: {
@@ -371,7 +371,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
 
 
   return {
-    name: "9router-usage-notifier",
+    name: "opencode-9router-usage",
 
     "chat.message": async (input) => {
       const providerID = input?.model?.providerID;

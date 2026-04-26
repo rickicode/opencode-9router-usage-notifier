@@ -15,29 +15,41 @@ OpenCode plugin that displays 9router usage statistics after each completed assi
 Primary install flow:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rickicode/opencode-9router-usage-notifier/main/scripts/install.sh | bash
+npx opencode-9router-usage
 ```
 
 What the installer does:
 
-- clones or updates the plugin in `~/.config/opencode/plugins/9router-usage-notifier`
-- runs `npm install`
-- runs `npm run setup` to create `~/.config/opencode/9router-usage.json` if missing
-- reminds you to ensure the plugin entry exists in `~/.config/opencode/opencode.json`
+- creates `~/.config/opencode/9router-usage.json` if missing
+- adds `opencode-9router-usage` to `~/.config/opencode/opencode.json`
+- relies on OpenCode's npm plugin support so the plugin is installed/loaded from the package entry directly
 
 Manual fallback:
 
 ```bash
-cd ~/.config/opencode/plugins
-git clone https://github.com/rickicode/opencode-9router-usage-notifier.git 9router-usage-notifier
-cd 9router-usage-notifier
-npm install
+npm install -g opencode-9router-usage
+opencode-9router-usage
+```
+
+If you prefer to edit OpenCode config yourself, add this plugin entry:
+
+```json
+{
+  "plugin": ["opencode-9router-usage"]
+}
+```
+
+Then create the plugin config file with:
+
+```bash
 npm run setup
 ```
 
+when working from this repo locally.
+
 ## Configuration
 
-1) Register plugin in `~/.config/opencode/opencode.json`:
+1) Ensure plugin is listed in `~/.config/opencode/opencode.json`:
 
 ```json
 {
@@ -45,10 +57,12 @@ npm run setup
     "@spoons-and-mirrors/subtask2@latest",
     "opencode-agent-skills",
     "@tarquinen/opencode-dcp@latest",
-    "~/.config/opencode/plugins/9router-usage-notifier"
+    "opencode-9router-usage"
   ]
 }
 ```
+
+The `npx opencode-9router-usage` command can add this automatically.
 
 2) Create plugin config file next to `opencode.json`:
 
