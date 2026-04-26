@@ -33,18 +33,18 @@ function normalizeAllowedProviders(value) {
   return result.length > 0 ? result : ["9routerplus"];
 }
 
-function normalizeSuccessDisplay(value) {
-  const normalized = String(value || "inline").trim().toLowerCase();
+function normalizeUsageDisplay(value) {
+  const normalized = String(value || "toast").trim().toLowerCase();
   if (["inline", "toast", "both"].includes(normalized)) return normalized;
-  return "inline";
+  return "toast";
 }
 
-function shouldRenderInline(successDisplay) {
-  return successDisplay === "inline" || successDisplay === "both";
+function shouldRenderInline(usageDisplay) {
+  return usageDisplay === "inline" || usageDisplay === "both";
 }
 
-function shouldShowSuccessToast(successDisplay) {
-  return successDisplay === "toast" || successDisplay === "both";
+function shouldShowSuccessToast(usageDisplay) {
+  return usageDisplay === "toast" || usageDisplay === "both";
 }
 
 function matchesAllowedProvider(modelMeta, allowedProviders) {
@@ -143,8 +143,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
     baseURL: "http://localhost:20128",
     period: "today",
     enabled: true,
-    toast: true,
-    successDisplay: "toast",
+    usageDisplay: "toast",
     minNotifyIntervalMs: 1500,
     requestTimeoutMs: 3500,
     allowedProviders: ["9routerplus"],
@@ -154,8 +153,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
 
   config.period = normalizePeriod(config.period);
   config.allowedProviders = normalizeAllowedProviders(config.allowedProviders);
-  config.successDisplay = normalizeSuccessDisplay(config.successDisplay);
-  const toastEnabled = config.toast !== false;
+  config.usageDisplay = normalizeUsageDisplay(config.usageDisplay);
 
   const lastNotifiedAtBySession = new Map();
   let lastErrorKey = null;
@@ -257,8 +255,6 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
   }
 
   async function showToast(body) {
-    if (!toastEnabled) return;
-
     try {
       await ctx.client?.tui?.showToast?.({ body });
     } catch (error) {
@@ -267,7 +263,6 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
   }
 
   async function showErrorToastOnce(errorKey, errorMessage) {
-    if (!toastEnabled) return;
     if (!errorKey || errorKey === lastErrorKey) return;
 
     lastErrorKey = errorKey;
@@ -280,7 +275,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
   }
 
   async function showSuccessToast(data) {
-    if (!shouldShowSuccessToast(config.successDisplay)) return;
+    if (!shouldShowSuccessToast(config.usageDisplay)) return;
 
     await showToast({
       title: formatToastTitle(data.period, data.summary),
@@ -291,7 +286,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
   }
 
   function applySuccessOutput(data, output) {
-    if (!shouldRenderInline(config.successDisplay)) return;
+    if (!shouldRenderInline(config.usageDisplay)) return;
     output.text = `${output.text}${formatUsageMessage(data, output.text)}`;
   }
 
@@ -319,7 +314,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
   }
 
   function shouldPrintIdleFallback() {
-    return !shouldShowSuccessToast(config.successDisplay) && !shouldRenderInline(config.successDisplay);
+    return !shouldShowSuccessToast(config.usageDisplay) && !shouldRenderInline(config.usageDisplay);
   }
 
   function printIdleFallback(output) {
@@ -328,7 +323,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
   }
 
   function createIdleFallbackOutput() {
-    if (shouldRenderInline(config.successDisplay)) return createInlineOutput();
+    if (shouldRenderInline(config.usageDisplay)) return createInlineOutput();
     return shouldPrintIdleFallback() ? createInlineOutput() : null;
   }
 
@@ -346,7 +341,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
   }
 
   function shouldSkipTextOutput() {
-    return !shouldRenderInline(config.successDisplay);
+    return !shouldRenderInline(config.usageDisplay);
   }
 
   function cloneOutput(output) {
@@ -376,7 +371,7 @@ export const NineRouterUsagePlugin = async (ctx, options = {}) => {
     "chat.message": async (input) => {
       const providerID = input?.model?.providerID;
       const modelID = input?.model?.modelID;
-      if (!providerID) return;
+      if (!providerID && !modelID) return;
       sessionModelById.set(input.sessionID, { providerID, modelID });
     },
 

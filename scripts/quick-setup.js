@@ -1,20 +1,49 @@
 #!/usr/bin/env node
-import { mkdir, writeFile, access, copyFile } from "node:fs/promises";
+import { mkdir, writeFile, access, readFile } from "node:fs/promises";
 import path from "node:path";
 
 const CONFIG_FILENAME = "9routerplus-usage.json";
-const LEGACY_CONFIG_FILENAME = "9router-usage.json";
-
 export const defaultConfig = {
   baseURL: "http://localhost:20128",
   period: "today",
   enabled: true,
-  toast: true,
-  successDisplay: "toast",
+  usageDisplay: "toast",
   minNotifyIntervalMs: 1500,
   requestTimeoutMs: 3500,
   allowedProviders: ["9routerplus"],
 };
+
+function normalizeUsageDisplay(value) {
+  const normalized = String(value || "toast").trim().toLowerCase();
+  return ["inline", "toast", "both"].includes(normalized) ? normalized : "toast";
+}
+
+function normalizeAllowedProviders(value) {
+  if (!Array.isArray(value)) return defaultConfig.allowedProviders;
+  const normalized = value
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+  return normalized.length > 0 ? normalized : defaultConfig.allowedProviders;
+}
+
+function normalizeConfigShape(raw = {}) {
+  return {
+    ...defaultConfig,
+    ...raw,
+    usageDisplay: normalizeUsageDisplay(raw.usageDisplay),
+    allowedProviders: normalizeAllowedProviders(raw.allowedProviders),
+  };
+}
+
+function serializeConfig(config) {
+  return `${JSON.stringify(config, null, 2)}\n`;
+}
+
+function getDefaultConfigOutput() {
+  return normalizeConfigShape(defaultConfig);
+}
+
+export { normalizeConfigShape };
 
 export function getHomeDirectory(env = process.env) {
   return env.HOME || env.USERPROFILE || null;
@@ -29,12 +58,6 @@ export function getConfigPath(home = getHomeDirectory()) {
   const opencodeDir = getOpencodeDir(home);
   if (!opencodeDir) return null;
   return path.join(opencodeDir, CONFIG_FILENAME);
-}
-
-export function getLegacyConfigPath(home = getHomeDirectory()) {
-  const opencodeDir = getOpencodeDir(home);
-  if (!opencodeDir) return null;
-  return path.join(opencodeDir, LEGACY_CONFIG_FILENAME);
 }
 
 async function exists(filePath) {
@@ -53,19 +76,13 @@ export async function ensureDefaultConfig(home = getHomeDirectory()) {
 
   const opencodeDir = getOpencodeDir(home);
   const configPath = getConfigPath(home);
-  const legacyConfigPath = getLegacyConfigPath(home);
   await mkdir(opencodeDir, { recursive: true });
 
   if (await exists(configPath)) {
     return { created: false, migrated: false, configPath };
   }
 
-  if (await exists(legacyConfigPath)) {
-    await copyFile(legacyConfigPath, configPath);
-    return { created: true, migrated: true, configPath };
-  }
-
-  await writeFile(configPath, `${JSON.stringify(defaultConfig, null, 2)}\n`, "utf8");
+  await writeFile(configPath, serializeConfig(getDefaultConfigOutput()), "utf8");
   return { created: true, migrated: false, configPath };
 }
 

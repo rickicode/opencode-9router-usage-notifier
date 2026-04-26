@@ -1,6 +1,6 @@
 {
   "name": "opencode-9routerplus-usage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenCode plugin that shows 9routerplus usage stats after AI completion",
   "main": "index.js",
   "type": "module",

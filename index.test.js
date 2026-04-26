@@ -86,30 +86,27 @@ test("shows success toast by default without adding inline output", async () => 
   }
 });
 
-
 test("uses today as the default period for success toast summaries", async () => {
   const originalFetch = global.fetch;
   const originalHome = process.env.HOME;
 
   process.env.HOME = "/tmp/9routerplus-plugin-tests-no-config";
 
-  const fetchMock = createFetchMock(async (input) => {
-    return {
-      ok: true,
-      async json() {
-        return {
-          ok: true,
-          period: "today",
-          summary: {
-            totalRequests: 1,
-            totalInputTokens: 10,
-            totalOutputTokens: 20,
-            estimatedCost: 0.01,
-          },
-        };
-      },
-    };
-  });
+  const fetchMock = createFetchMock(async () => ({
+    ok: true,
+    async json() {
+      return {
+        ok: true,
+        period: "today",
+        summary: {
+          totalRequests: 1,
+          totalInputTokens: 10,
+          totalOutputTokens: 20,
+          estimatedCost: 0.01,
+        },
+      };
+    },
+  }));
 
   global.fetch = fetchMock;
   const toastCalls = [];
@@ -153,7 +150,6 @@ test("uses today as the default period for success toast summaries", async () =>
     process.env.HOME = originalHome;
   }
 });
-
 
 test("prefers completed text as the success path even if session.idle fires first", async () => {
   const originalFetch = global.fetch;
@@ -235,7 +231,6 @@ test("prefers completed text as the success path even if session.idle fires firs
     process.env.HOME = originalHome;
   }
 });
-
 
 test("does not consume debounce state on failed idle fallback before completed text succeeds", async () => {
   const originalFetch = global.fetch;
@@ -331,7 +326,6 @@ test("does not consume debounce state on failed idle fallback before completed t
   }
 });
 
-
 test("does not emit success status when provider is not allowed", async () => {
   const originalFetch = global.fetch;
   const originalHome = process.env.HOME;
@@ -387,7 +381,6 @@ test("does not emit success status when provider is not allowed", async () => {
     process.env.HOME = originalHome;
   }
 });
-
 
 test("shows usage when model id is namespaced under allowed provider", async () => {
   const originalFetch = global.fetch;
@@ -463,6 +456,62 @@ test("shows usage when model id is namespaced under allowed provider", async () 
   }
 });
 
+test("supports namespaced model matching from chat.message without providerID", async () => {
+  const originalFetch = global.fetch;
+  const originalHome = process.env.HOME;
+
+  process.env.HOME = "/tmp/9routerplus-plugin-tests-no-config";
+
+  const fetchMock = createFetchMock(async () => ({
+    ok: true,
+    async json() {
+      return {
+        ok: true,
+        period: "today",
+        summary: {
+          totalRequests: 8,
+          totalInputTokens: 800,
+          totalOutputTokens: 400,
+          estimatedCost: 0.3,
+        },
+      };
+    },
+  }));
+
+  global.fetch = fetchMock;
+  const toastCalls = [];
+
+  try {
+    const plugin = await NineRouterUsagePlugin({
+      serverUrl: "http://localhost:4096",
+      directory: "/workspaces/plugin-9router-plus",
+      client: {
+        tui: {
+          showToast: async (payload) => {
+            toastCalls.push(payload);
+          },
+        },
+      },
+    });
+
+    await plugin["chat.message"]({
+      sessionID: "session-chat-message-namespaced",
+      model: { modelID: "9routerplus/cx/gpt-5.3-codex" },
+    });
+
+    const output = { text: "Assistant answer" };
+    await plugin["experimental.text.complete"](
+      { sessionID: "session-chat-message-namespaced", messageID: "m6", partID: "p6" },
+      output,
+    );
+
+    assert.equal(fetchMock.calls.length, 1);
+    assert.equal(toastCalls.length, 1);
+  } finally {
+    global.fetch = originalFetch;
+    process.env.HOME = originalHome;
+  }
+});
 
 test("does not emit success status when provider attribution is missing", async () => {
   const originalFetch = global.fetch;
@@ -492,7 +541,7 @@ test("does not emit success status when provider attribution is missing", async 
 
     const output = { text: "Assistant answer" };
     await plugin["experimental.text.complete"](
-      { sessionID: "session-missing-provider", messageID: "m5", partID: "p5" },
+      { sessionID: "session-missing-provider", messageID: "m7", partID: "p7" },
       output,
     );
 
@@ -505,7 +554,6 @@ test("does not emit success status when provider attribution is missing", async 
     process.env.HOME = originalHome;
   }
 });
-
 
 test("shows success via toast only without adding inline output and still uses one summary request", async () => {
   const originalFetch = global.fetch;
@@ -553,7 +601,7 @@ test("shows success via toast only without adding inline output and still uses o
           },
         },
       },
-      { successDisplay: "toast" },
+      { usageDisplay: "toast" },
     );
 
     await plugin["chat.params"](
@@ -569,7 +617,7 @@ test("shows success via toast only without adding inline output and still uses o
 
     const output = { text: "Assistant answer" };
     await plugin["experimental.text.complete"](
-      { sessionID: "session-toast-only", messageID: "m7", partID: "p7" },
+      { sessionID: "session-toast-only", messageID: "m8", partID: "p8" },
       output,
     );
 
@@ -630,7 +678,7 @@ test("shows success via both inline output and toast from the same summary reque
           },
         },
       },
-      { successDisplay: "both" },
+      { usageDisplay: "both" },
     );
 
     await plugin["chat.params"](
@@ -646,7 +694,7 @@ test("shows success via both inline output and toast from the same summary reque
 
     const output = { text: "Assistant answer" };
     await plugin["experimental.text.complete"](
-      { sessionID: "session-both", messageID: "m8", partID: "p8" },
+      { sessionID: "session-both", messageID: "m9", partID: "p9" },
       output,
     );
 

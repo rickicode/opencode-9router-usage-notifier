@@ -80,6 +80,8 @@ async function main() {
   }
 
   console.log(`${LOG_PREFIX} OpenCode will install/load plugin package: ${result.packageName}`);
+  console.log(`${LOG_PREFIX} If 9routerplus is not at http://localhost:20128, update baseURL in ${result.configPath}`);
+  console.log(`${LOG_PREFIX} If your OpenCode provider name is 9router or your model namespace is not 9routerplus, update allowedProviders in ${result.configPath} to match the real provider/model name.`);
 }
 
 main().catch((error) => {

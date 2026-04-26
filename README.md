@@ -7,8 +7,7 @@ OpenCode plugin that displays 9routerplus usage statistics after each completed 
 - Shows usage stats after every AI response
 - Displays: estimated cost, input/output tokens, total requests
 - Configurable period: `today`, `last24h`, or `7d` (defaults to `today`)
-- Success display mode supports `inline`, `toast`, or `both` and defaults to `toast`
-- TUI toast notification is used for success by default and for error paths when enabled
+- Usage display mode supports `inline`, `toast`, or `both` and defaults to `toast`
 
 ## Installation
 
@@ -23,6 +22,7 @@ What the installer does:
 - creates `~/.config/opencode/9routerplus-usage.json` if missing
 - adds `opencode-9routerplus-usage` to `~/.config/opencode/opencode.json`
 - relies on OpenCode's npm plugin support so the plugin is installed/loaded from the package entry directly
+- prints a reminder to check `baseURL` and `allowedProviders`
 
 Manual fallback:
 
@@ -73,8 +73,7 @@ Path: `~/.config/opencode/9routerplus-usage.json`
   "baseURL": "http://localhost:20128",
   "period": "today",
   "enabled": true,
-  "toast": true,
-  "successDisplay": "toast",
+  "usageDisplay": "toast",
   "minNotifyIntervalMs": 1500,
   "requestTimeoutMs": 3500,
   "allowedProviders": ["9routerplus"]
@@ -87,7 +86,7 @@ Minimal (recommended to start):
 {
   "baseURL": "http://localhost:20128",
   "period": "today",
-  "successDisplay": "toast",
+  "usageDisplay": "toast",
   "allowedProviders": ["9routerplus"]
 }
 ```
@@ -103,23 +102,22 @@ npm run setup
 - `baseURL` - 9routerplus server URL (default: `http://localhost:20128`)
 - `period` - Time period: `today`, `last24h`, or `7d` (default: `today`)
 - `enabled` - Enable/disable plugin (default: `true`)
-- `toast` - Enable/disable TUI toast notifications (default: `true`)
-- `successDisplay` - Success presentation mode: `inline`, `toast`, or `both` (default: `toast`)
+- `usageDisplay` - Usage presentation mode: `inline`, `toast`, or `both` (default: `toast`)
 - `minNotifyIntervalMs` - De-duplicate end-of-turn status emission across supported completion hooks per session (default: `1500`)
 - `requestTimeoutMs` - API request timeout in ms (default: `3500`)
-- `allowedProviders` - Show usage when active provider matches, or when the model id is namespaced under an allowed provider such as `9router/...` (default: `["9router"]`)
+- `allowedProviders` - Show usage when active provider matches, or when the model id is namespaced under an allowed provider such as `9routerplus/...` (default: `["9routerplus"]`)
 
 ### Behavior
 
 - Plugin reads model/provider from OpenCode session metadata.
 - Success status appears when provider attribution matches `allowedProviders`, or when the model id itself is namespaced under an allowed provider.
 - End-of-turn success output is de-duplicated across `session.idle` and `experimental.text.complete`.
-- Success mode `toast` is the default; `inline` and `both` reuse the same fetched summary data.
+- `usageDisplay` is the only presentation switch for usage output.
 - API/runtime errors are shown as toast and de-duplicated (shown once per error key until recovery).
 
 ## Usage
 
-Once installed and configured, the plugin shows a success toast after each eligible assistant completion by default. If you switch `successDisplay` to `inline` or `both`, the inline status block looks like this:
+Once installed and configured, the plugin shows a success toast after each eligible assistant completion by default. If you switch `usageDisplay` to `inline` or `both`, the inline status block looks like this:
 
 ```text
 ────────────────────────────────────────────────────

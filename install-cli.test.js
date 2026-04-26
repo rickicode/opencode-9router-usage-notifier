@@ -18,8 +18,11 @@ test("installFromPackage creates config and registers package plugin", async () 
   const opencodeConfig = await readJson(result.opencodeConfigPath);
 
   assert.equal(result.configCreated, true);
+  assert.equal(result.configMigrated, false);
   assert.equal(result.pluginRegistered, true);
   assert.equal(pluginConfig.baseURL, "http://localhost:20128");
+  assert.equal(pluginConfig.usageDisplay, "toast");
+  assert.deepEqual(pluginConfig.allowedProviders, ["9routerplus"]);
   assert.deepEqual(opencodeConfig.plugin, ["opencode-9routerplus-usage"]);
 });
 
@@ -30,7 +33,7 @@ test("installFromPackage preserves existing config and avoids duplicate plugin e
 
   await writeFile(
     path.join(opencodeDir, "9routerplus-usage.json"),
-    `${JSON.stringify({ baseURL: "http://example.test", period: "7d" }, null, 2)}\n`,
+    `${JSON.stringify({ baseURL: "http://example.test", period: "7d", usageDisplay: "both" }, null, 2)}\n`,
     "utf8",
   );
   await writeFile(
@@ -46,5 +49,6 @@ test("installFromPackage preserves existing config and avoids duplicate plugin e
   assert.equal(result.configCreated, false);
   assert.equal(result.pluginRegistered, false);
   assert.equal(pluginConfig.baseURL, "http://example.test");
+  assert.equal(pluginConfig.usageDisplay, "both");
   assert.deepEqual(opencodeConfig.plugin, ["opencode-9routerplus-usage", "other-plugin"]);
 });
