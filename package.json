@@ -1,0 +1,17 @@
+{
+  "name": "9router-usage-notifier",
+  "version": "0.1.0",
+  "description": "OpenCode plugin that shows 9router usage stats after AI completion",
+  "main": "index.js",
+  "type": "module",
+  "keywords": ["opencode-plugin", "9router", "usage", "notification"],
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test index.test.js",
+    "setup": "node scripts/quick-setup.js"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.14.24"
+  }
+}
